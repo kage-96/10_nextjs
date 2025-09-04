@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
 
-interface UpdatePostRequestBody {
+export interface UpdatePostRequestBody {
   title:string
   content:string
   categories:{id:number}[]

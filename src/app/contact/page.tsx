@@ -1,9 +1,9 @@
 "use client";
-import React, { useState, type ChangeEvent, type FormEvent } from 'react'
+import React, { useState, type FormEvent } from 'react'
 import { Label } from './_components/Label';
 import { FormGroup } from './_components/FormGroup';
 import { ErrorMessage } from './_components/ErrorMessage';
-import { Input } from './_components/Input';
+import { Input } from '../_components/Input';
 
 export default function Page(){
   const url = 'https://1hmfpsvto6.execute-api.ap-northeast-1.amazonaws.com/dev/contacts';
@@ -100,15 +100,15 @@ export default function Page(){
         <FormGroup>
           <Label text='お名前' htmlFor='name' />
           <div className='w-full'>
-            <Input type="text" id='name' onChange={(value) => setName(value) } value={name} isSubmitting={isSubmitting} />
+            <Input type="text" id='name' onChange={(e) => setName(e.target.value) } value={name}  />
             <ErrorMessage message={nameErrorMessage} />
           </div>
         </FormGroup>
-
+        
         <FormGroup>
           <Label text='メールアドレス' htmlFor='email' />
           <div className='w-full'>
-            <Input type="email" value={email} id='email' onChange={(value) => setEmail(value) } isSubmitting={isSubmitting} />
+            <Input type="email" value={email} id='email' onChange={(e) => setEmail(e.target.value) } />
             <ErrorMessage message={emailErrorMessage} />
           </div>
         </FormGroup>

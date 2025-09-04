@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
 
-interface CreateCategoryRequestBody {
+export interface CreateCategoryRequestBody {
   name:string
 }
 

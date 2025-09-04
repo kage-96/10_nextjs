@@ -1,11 +1,11 @@
 import { ChangeEvent, FC } from "react"
 
 
-interface ButtonProps extends React.ComponentProps<'input'> {
+interface Props extends React.ComponentProps<'input'> {
   onChange:(e:ChangeEvent<HTMLInputElement>) => void;
 }
 
-export const Input:FC<ButtonProps> = ({onChange,...props}) => {
+export const Input:FC<Props> = ({onChange,...props}) => {
   return(
     <div>
       <input

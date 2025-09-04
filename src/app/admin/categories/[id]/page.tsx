@@ -1,9 +1,8 @@
 'use client'
 import { useParams, useRouter } from "next/navigation"
 import { useEffect, useState } from "react";
-import { Button } from "../../../_components/Button";
-import { Input } from "@/app/_components/Input";
-import { Label } from "@/app/_components/Label";
+import { CategoryForm } from "../_components/CategoryForm";
+import { UpdateCategoryRequestBody } from "@/app/api/admin/categories/[id]/route";
 
 export default function Page(){
   const [name,setName] = useState<string>("")
@@ -17,17 +16,18 @@ export default function Page(){
       return;
     };
 
+    const body:UpdateCategoryRequestBody = {name}
     const res = await fetch(`/api/admin/categories/${id}`,{
       method:'PUT',
       headers:{
         'Content-Type': 'application/json',
       },
-      body:JSON.stringify({name}),
+      body:JSON.stringify(body),
     })
 
     if(res.status === 200){ 
       alert('カテゴリーを更新しました。')
-      router.push('/admin/categories')
+      router.replace('/admin/categories')
     }else{
       alert('カテゴリーの更新に失敗しました。')
     }
@@ -42,7 +42,7 @@ export default function Page(){
     })
     if(res.status === 200){
       alert('カテゴリーを削除しました。')
-      router.push('/admin/categories');
+      router.replace('/admin/categories');
     }else{
       alert('カテゴリーの削除に失敗しました。')
     }
@@ -58,22 +58,12 @@ export default function Page(){
   },[id])
 
   return(
-      <div className="container mx-auto px-4">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold mb-4">カテゴリー編集</h1>
-      </div>
-
-      <form className="space-y-4" onSubmit={handleSubmit}>
-        <div>
-          <Label htmlFor="category">カテゴリー名</Label>
-          <Input id='category' type="text" value={name} onChange={(e) => setName(e.target.value) } />
-        </div>
-
-        <div className="flex gap-2">
-          <Button type='submit' variant="post">更新</Button>
-          <Button onClick={handleDelete} type='button' variant='delete'>削除</Button>
-        </div>
-      </form>
-    </div>
+    <CategoryForm
+      mode='edit'
+      onDelete={handleDelete}
+      onSubmit={handleSubmit}
+      setName={setName}
+      name={name}
+       />
   )
 }
