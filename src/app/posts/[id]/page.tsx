@@ -10,7 +10,7 @@ export default function Page(){
 
   useEffect(() => {
     const fetcher = async () => {
-      const res = await fetch(`/api/admin/posts/${id}`)
+      const res = await fetch(`/api/posts/${id}`)
       const {post} = await res.json();
       setPost(post);
     }

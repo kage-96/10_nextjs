@@ -12,8 +12,8 @@ export interface CreatePostRequestBody {
 
 export const POST = async (request:NextRequest) => {
   try{
-    const body = await request.json();
 
+    const body = await request.json();
     const {title,content,categories,thumbnailUrl}:CreatePostRequestBody = body;
 
     const data = await prisma.post.create({
@@ -23,6 +23,7 @@ export const POST = async (request:NextRequest) => {
         thumbnailUrl
       },
     })
+    
     for(const category of categories){
       await prisma.postCategory.create({
         data:{

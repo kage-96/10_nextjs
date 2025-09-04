@@ -9,7 +9,7 @@ export default function Home(){
 
   useEffect(() => {
     const fetcher = async () => {
-      const res = await fetch('/api/admin/posts',{
+      const res = await fetch('/api/posts',{
         method:"GET"
       })
       const {posts}:{posts:Post[]} = await res.json();
