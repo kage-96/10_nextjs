@@ -2,18 +2,23 @@
 import { Category } from "@/types/Category";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+
 import { PostForm } from "../_components/PostForm";
 import { CreatePostRequestBody } from "@/app/api/admin/posts/route";
+import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
 
 export default function Page(){
   const [title,setTitle] = useState<string>("")
   const [content,setContent] = useState<string>("")
-  const [thumbnailUrl,setThumbnailUrl] = useState<string>("https://placehold.jp/800x400.png")
+  const [thumbnailUrl,setThumbnailUrl] = useState<string>("")
   const [categories, setCategories] = useState<Category[]>([])
   const router = useRouter();
 
+  const {token} = useSupabaseSession()
+
   const handleSubmit = async (e:React.FormEvent) => {
     e.preventDefault();
+    if(!token) return;
 
     if(title.trim() === ""){
       return;
@@ -24,6 +29,7 @@ export default function Page(){
       'method':'POST',
       headers:{
         'Content-Type': 'application/json',
+        Authorization: token,
       },
       body:JSON.stringify(body),
     })

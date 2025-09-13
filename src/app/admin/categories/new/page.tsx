@@ -3,13 +3,16 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { CategoryForm } from "../_components/CategoryForm";
 import { CreateCategoryRequestBody } from "@/app/api/admin/categories/route";
+import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
 
 export default function Page(){
   const [name,setName] = useState<string>("")
   const router = useRouter();
+  const {token} = useSupabaseSession();
 
   const handleSubmit = async (e:React.FormEvent) => {
     e.preventDefault();
+    if(!token)return
 
     if(name.trim() === "")return;
 
@@ -18,6 +21,7 @@ export default function Page(){
       method:'POST',
       headers:{
         'Content-Type': 'application/json',
+        Authorization: token,
       },
       body:JSON.stringify(body),
     })

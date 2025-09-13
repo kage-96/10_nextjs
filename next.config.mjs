@@ -2,6 +2,7 @@
 const nextConfig = {
   images:{
     remotePatterns:[{protocol:'https',hostname:'placehold.jp'}],
+    remotePatterns:[{protocol:'https',hostname:'rvuoczdnmwspjmbrabcy.supabase.co'}],
   },
 };
 

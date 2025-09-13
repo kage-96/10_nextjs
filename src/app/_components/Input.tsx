@@ -11,7 +11,7 @@ export const Input:FC<Props> = ({onChange,...props}) => {
       <input
         {...props}
         onChange={onChange}
-        className="block border w-full p-3 rounded-md mt-1 border-gray-200"
+        className="block border w-full p-3 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 text-gray-900 rounded-md mt-1 border-gray-200"
         />
       </div>
   )

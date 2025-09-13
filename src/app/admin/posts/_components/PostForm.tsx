@@ -4,7 +4,10 @@ import { Textarea } from "./Textarea";
 import { CategoriesSelect } from "./CategoriesSelect";
 import { Button } from "@/app/_components/Button";
 import { Category } from "@/types/Category";
-import { FC } from "react";
+import { ChangeEvent, FC, useEffect, useState } from "react";
+import { supabase } from "@/utils/supabase";
+import { v4 as uuidv4 } from 'uuid'
+import Image from 'next/image'
 
 interface Props {
   mode:'new' | 'edit'
@@ -15,12 +18,60 @@ interface Props {
   categories:Category[]
   setCategories:(categories:Category[]) => void
   thumbnailUrl:string
-  setThumbnailUrl: (thubmnailUrl:string) => void
+  setThumbnailUrl: (thumbnailUrl:string) => void
   onDelete?:() => void
   onSubmit:(e:React.FormEvent) => void
 }
 
-export const PostForm:FC<Props> = ({mode,title,setTitle,content,setContent,categories,setCategories,thumbnailUrl,setThumbnailUrl,onDelete,onSubmit}) => {
+export const PostForm:FC<Props> = ({
+  mode,
+  title,
+  setTitle,
+  content,
+  setContent,
+  categories,
+  setCategories,
+  thumbnailUrl,
+  setThumbnailUrl,
+  onDelete,
+  onSubmit
+}) => {
+  const [thumbnailImageUrl,setThumbnailImageUrl] = useState<string | null>(null)
+  
+  useEffect(() => {
+    if(!thumbnailUrl) return;
+
+    const fetcher = async () => {
+      const {data:{publicUrl}} = await supabase.storage
+      .from('post_thumbnail')
+      .getPublicUrl(thumbnailUrl)
+
+      setThumbnailImageUrl(publicUrl)
+    }
+    fetcher()
+  },[thumbnailUrl])
+
+  const handleImageChange = async (e:ChangeEvent<HTMLInputElement>,):Promise<void> => {
+    if(!e.target.files || e.target.files.length === 0){
+      return
+    }
+    const file = e.target.files[0] //選択された画像を取得
+    const filePath = `private/${uuidv4()}` //ファイルパスを指定
+
+    const {data,error} = await supabase.storage.from('post_thumbnail')
+    .upload(filePath,file,{
+      cacheControl:'3600',
+      upsert:false,
+    })
+
+    if(error){
+      alert(error.message)
+      return
+    }
+    setThumbnailUrl(data.path)
+  }
+
+
   return(
     <div className="container mx-auto px-4">
     <div className="mb-8">
@@ -56,8 +107,13 @@ export const PostForm:FC<Props> = ({mode,title,setTitle,content,setContent,categ
       </div>
 
       <div>{/* サムネイル */}
-        <Label htmlFor="thubmnail">サムネイルURL</Label>
-        <Input id="thubmnail" type="text" value={thumbnailUrl} onChange={(e) => setThumbnailUrl(e.target.value) }  />
+        <Label htmlFor="thumbnailUrl">サムネイルURL</Label>
+        <Input id="thumbnailUrl" type="file" onChange={handleImageChange} accept="image/*" />
+        {thumbnailImageUrl && (
+          <div className="mt-2">
+            <Image src={thumbnailImageUrl} alt='thumbnail' width={400} height={400} />
+          </div>
+        )}
       </div>
 
       <div>{/* カテゴリー */}

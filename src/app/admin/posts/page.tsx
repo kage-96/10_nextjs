@@ -1,19 +1,26 @@
 'use client'
+import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
 import { Post } from "@/types/Post";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function Page(){
   const [posts, setPosts] = useState<Post[]>([])
+  const {token} = useSupabaseSession();
+  
   useEffect(() => {
+    if(!token) return;
     const fetcher = async () => {
-      const res = await fetch('/api/admin/posts');
+      const res = await fetch('/api/admin/posts',{
+        headers:{
+          Authorization: token,
+        }
+      });
       const {posts} = await res.json()
-      console.log(posts)
-      setPosts(posts)
+      setPosts([...posts])
     }
     fetcher();
-  },[])
+  },[token])
   
   return(
     <>
@@ -23,13 +30,12 @@ export default function Page(){
       </div>
       <ul>
         {posts.map((post) => {
-          const date = new Date(post.createdAt);
           return(
           <li key={post.id}>
             <Link href={`/admin/posts/${post.id}`}>
               <div className="border-b border-gray-300 p-4 hover:bg-gray-100 cursor-pointer">
                 <p className="text-xl font-bold">{post.title}</p>
-                <p className="text-gray-500">{`${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`}</p>
+                <p className="text-gray-500">{new Date(post.createdAt).toLocaleDateString()}</p>
               </div>
             </Link>
           </li>

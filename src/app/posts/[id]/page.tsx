@@ -7,16 +7,19 @@ import React, { useEffect, useState } from 'react'
 export default function Page(){
   const [post,setPost] = useState<Post | null>(null)
   const {id} = useParams();
+  const [isLoading,setIsLoading] = useState(true)
 
   useEffect(() => {
     const fetcher = async () => {
       const res = await fetch(`/api/posts/${id}`)
       const {post} = await res.json();
       setPost(post);
+      setIsLoading(false)
     }
     fetcher()
   },[id])
 
+  if(isLoading)return <p>Loading...</p>
   if(!post)return <p>記事が見つかりません。</p>
 
   return (

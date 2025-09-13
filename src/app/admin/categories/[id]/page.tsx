@@ -3,14 +3,17 @@ import { useParams, useRouter } from "next/navigation"
 import { useEffect, useState } from "react";
 import { CategoryForm } from "../_components/CategoryForm";
 import { UpdateCategoryRequestBody } from "@/app/api/admin/categories/[id]/route";
+import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
 
 export default function Page(){
   const [name,setName] = useState<string>("")
   const {id} = useParams();
   const router = useRouter();
+  const {token} = useSupabaseSession()
 
   const handleSubmit = async (e:React.FormEvent) => {
     e.preventDefault();
+    if(!token) return
 
     if(name.trim() === ""){
       return;
@@ -21,6 +24,7 @@ export default function Page(){
       method:'PUT',
       headers:{
         'Content-Type': 'application/json',
+        Authorization: token,
       },
       body:JSON.stringify(body),
     })
@@ -36,9 +40,13 @@ export default function Page(){
 
   const handleDelete = async () => {
     if(!confirm("本当に削除しますか？")) return;
+    if(!token)return
 
     const res = await fetch(`/api/admin/categories/${id}`,{
-      method:"DELETE"
+      method:"DELETE",
+      headers:{
+        Authorization: token,
+      }
     })
     if(res.status === 200){
       alert('カテゴリーを削除しました。')
@@ -49,13 +57,18 @@ export default function Page(){
   }
 
   useEffect(() => {
+    if(!token) return
     const fetcher = async () => {
-      const res = await fetch(`/api/admin/categories/${id}`);
+      const res = await fetch(`/api/admin/categories/${id}`,{
+        headers:{
+          Authorization: token,
+        }
+      });
       const {category} = await res.json();
       setName(category.name);
     }
     fetcher();
-  },[id])
+  },[id,token])
 
   return(
     <CategoryForm

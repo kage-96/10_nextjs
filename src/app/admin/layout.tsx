@@ -1,8 +1,11 @@
 'use client'
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useRouteGuard } from "../_hooks/useRouteGuard";
 
 export default function AdminLayout({children}:{children:React.ReactNode}){
+  useRouteGuard();
+  
   const pathname = usePathname();
 
   return(
@@ -14,7 +17,7 @@ export default function AdminLayout({children}:{children:React.ReactNode}){
         </ul>
       </aside>
 
-      <div className="ml-[280px] p-4">{children}</div>
+      <div className="ml-[280px] p-4 pt-[100px]">{children}</div>
     </>
   )
 }

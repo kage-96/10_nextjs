@@ -1,20 +1,27 @@
 'use client'
+import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
 import { Category } from "@/types/Category";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function Page(){
   const [categories, setCategories] = useState<Category[]>([])
+  const {token} = useSupabaseSession()
 
   useEffect(() => {
+    if(!token) return
     const fetcher = async () => {
-      const res = await fetch('/api/admin/categories');
+      const res = await fetch('/api/admin/categories',{
+        headers:{
+          Authorization: token,
+        }
+      });
       const {categories} = await res.json()
       setCategories(categories)
     }
     fetcher();
-  },[])
-  if(categories.length === 0) return <p>まだカテゴリーがありません。</p>
+  },[token])
+  
   return(
     <>
       <div className="flex justify-between items-center mb-8">
