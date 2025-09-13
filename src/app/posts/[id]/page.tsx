@@ -1,5 +1,6 @@
 'use client'
 import { Post } from '@/types/Post';
+import { supabase } from '@/utils/supabase';
 import Image from 'next/image';
 import { useParams } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
@@ -8,6 +9,7 @@ export default function Page(){
   const [post,setPost] = useState<Post | null>(null)
   const {id} = useParams();
   const [isLoading,setIsLoading] = useState(true)
+  const [thumbnailImageUrl,setThumbnailImageUrl] = useState<string | null>(null)
 
   useEffect(() => {
     const fetcher = async () => {
@@ -19,12 +21,27 @@ export default function Page(){
     fetcher()
   },[id])
 
+  useEffect(() => {
+    if(!post?.thumbnailUrl) return;
+
+    const fetcher = async () => {
+      const {data:{publicUrl}} = await supabase.storage
+      .from('post_thumbnail')
+      .getPublicUrl(post.thumbnailUrl)
+
+      setThumbnailImageUrl(publicUrl)
+    }
+    fetcher()
+  },[post?.thumbnailUrl])
+
   if(isLoading)return <p>Loading...</p>
   if(!post)return <p>記事が見つかりません。</p>
 
   return (
     <div className='max-w-[800px] mx-auto m-8 p-2'>
-      <Image src={post.thumbnailUrl} alt='' height={1000} width={1000} />
+      {thumbnailImageUrl && (
+        <Image src={thumbnailImageUrl} alt='' height={400} width={400} />
+      )}
       <div className="flex justify-between items-center text-sm my-4">
         <p className="text-gray-500">
           {new Date(post.createdAt).toLocaleDateString()}

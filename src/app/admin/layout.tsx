@@ -17,7 +17,7 @@ export default function AdminLayout({children}:{children:React.ReactNode}){
         </ul>
       </aside>
 
-      <div className="ml-[280px] p-4 pt-[100px]">{children}</div>
+      <div className="ml-[280px] p-4">{children}</div>
     </>
   )
 }

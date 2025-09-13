@@ -15,7 +15,7 @@ export const Header:FC = () => {
   }
 
   return (
-    <header className='header bg-gray-800 font-bold text-white fixed w-full h-18'>
+    <header className='header bg-gray-800 font-bold text-white fixed w-full h-18 top-0 left-0'>
       <nav>
         <ul className='flex item-center justify-between p-6'>
           <li><Link href='/'>Blog</Link></li>
