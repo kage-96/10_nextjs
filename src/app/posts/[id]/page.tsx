@@ -22,17 +22,17 @@ export default function Page(){
   },[id])
 
   useEffect(() => {
-    if(!post?.thumbnailUrl) return;
+    if(!post?.thumbnailImageKey) return;
 
     const fetcher = async () => {
       const {data:{publicUrl}} = await supabase.storage
       .from('post_thumbnail')
-      .getPublicUrl(post.thumbnailUrl)
+      .getPublicUrl(post.thumbnailImageKey)
 
       setThumbnailImageUrl(publicUrl)
     }
     fetcher()
-  },[post?.thumbnailUrl])
+  },[post?.thumbnailImageKey])
 
   if(isLoading)return <p>Loading...</p>
   if(!post)return <p>記事が見つかりません。</p>

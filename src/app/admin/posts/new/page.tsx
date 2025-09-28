@@ -10,7 +10,7 @@ import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
 export default function Page(){
   const [title,setTitle] = useState<string>("")
   const [content,setContent] = useState<string>("")
-  const [thumbnailUrl,setThumbnailUrl] = useState<string>("")
+  const [thumbnailImageKey,setThumbnailImageKey] = useState<string>("")
   const [categories, setCategories] = useState<Category[]>([])
   const router = useRouter();
 
@@ -24,7 +24,7 @@ export default function Page(){
       return;
     };
 
-    const body:CreatePostRequestBody = {title,content,thumbnailUrl,categories}
+    const body:CreatePostRequestBody = {title,content,thumbnailImageKey,categories}
     const res = await fetch('/api/admin/posts',{
       'method':'POST',
       headers:{
@@ -52,8 +52,8 @@ export default function Page(){
       setContent={setContent}
       categories={categories}
       setCategories={setCategories}
-      thumbnailUrl={thumbnailUrl}
-      setThumbnailUrl={setThumbnailUrl}
+      thumbnailImageKey={thumbnailImageKey}
+      setThumbnailImageKey={setThumbnailImageKey}
       onSubmit={handleSubmit}
       mode='new'
     />

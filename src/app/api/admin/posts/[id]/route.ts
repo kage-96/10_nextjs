@@ -8,7 +8,7 @@ export interface UpdatePostRequestBody {
   title:string
   content:string
   categories:{id:number}[]
-  thumbnailUrl:string
+  thumbnailImageKey:string
 }
 
 export const PUT = async(request:NextRequest,{params}:{params:{id:string}}) => {
@@ -21,7 +21,7 @@ export const PUT = async(request:NextRequest,{params}:{params:{id:string}}) => {
   }
   const {id} = params;
 
-  const {title,content,categories,thumbnailUrl}:UpdatePostRequestBody = await request.json();
+  const {title,content,categories,thumbnailImageKey}:UpdatePostRequestBody = await request.json();
 
   try{
     const post = await prisma.post.update({
@@ -31,7 +31,7 @@ export const PUT = async(request:NextRequest,{params}:{params:{id:string}}) => {
       data:{
         title,
         content,
-        thumbnailUrl
+        thumbnailImageKey
       },
     })
     await prisma.postCategory.deleteMany({

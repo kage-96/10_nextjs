@@ -8,7 +8,7 @@ export interface CreatePostRequestBody {
   title:string
   content:string
   categories:{id:number}[]
-  thumbnailUrl:string
+  thumbnailImageKey:string
 }
 
 export const POST = async (request:NextRequest) => {
@@ -23,13 +23,13 @@ export const POST = async (request:NextRequest) => {
   try{
 
     const body = await request.json();
-    const {title,content,categories,thumbnailUrl}:CreatePostRequestBody = body;
+    const {title,content,categories,thumbnailImageKey}:CreatePostRequestBody = body;
 
     const data = await prisma.post.create({
       data:{
         title,
         content,
-        thumbnailUrl
+        thumbnailImageKey
       },
     })
     

@@ -17,8 +17,8 @@ interface Props {
   setContent:(content:string) => void
   categories:Category[]
   setCategories:(categories:Category[]) => void
-  thumbnailUrl:string
-  setThumbnailUrl: (thumbnailUrl:string) => void
+  thumbnailImageKey:string
+  setThumbnailImageKey: (thumbnailImageKey:string) => void
   onDelete?:() => void
   onSubmit:(e:React.FormEvent) => void
 }
@@ -31,25 +31,25 @@ export const PostForm:FC<Props> = ({
   setContent,
   categories,
   setCategories,
-  thumbnailUrl,
-  setThumbnailUrl,
+  thumbnailImageKey,
+  setThumbnailImageKey,
   onDelete,
   onSubmit
 }) => {
   const [thumbnailImageUrl,setThumbnailImageUrl] = useState<string | null>(null)
   
   useEffect(() => {
-    if(!thumbnailUrl) return;
+    if(!thumbnailImageKey) return;
 
     const fetcher = async () => {
       const {data:{publicUrl}} = await supabase.storage
       .from('post_thumbnail')
-      .getPublicUrl(thumbnailUrl)
+      .getPublicUrl(thumbnailImageKey)
 
       setThumbnailImageUrl(publicUrl)
     }
     fetcher()
-  },[thumbnailUrl])
+  },[thumbnailImageKey])
 
   const handleImageChange = async (e:ChangeEvent<HTMLInputElement>,):Promise<void> => {
     if(!e.target.files || e.target.files.length === 0){
@@ -68,7 +68,7 @@ export const PostForm:FC<Props> = ({
       alert(error.message)
       return
     }
-    setThumbnailUrl(data.path)
+    setThumbnailImageKey(data.path)
   }
 
 
@@ -107,8 +107,8 @@ export const PostForm:FC<Props> = ({
       </div>
 
       <div>{/* サムネイル */}
-        <Label htmlFor="thumbnailUrl">サムネイルURL</Label>
-        <Input id="thumbnailUrl" type="file" onChange={handleImageChange} accept="image/*" />
+        <Label htmlFor="thumbnailImageKey">サムネイルURL</Label>
+        <Input id="thumbnailImageKey" type="file" onChange={handleImageChange} accept="image/*" />
         {thumbnailImageUrl && (
           <div className="mt-2">
             <Image src={thumbnailImageUrl} alt='thumbnail' width={400} height={400} />

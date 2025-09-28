@@ -12,7 +12,7 @@ import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
 export default function Page(){
   const [title,setTitle] = useState<string>("")
   const [content,setContent] = useState<string>("")
-  const [thumbnailUrl,setThumbnailUrl] = useState<string>("")
+  const [thumbnailImageKey,setThumbnailImageKey] = useState<string>("")
   const [categories, setCategories] = useState<Category[]>([])
   const router = useRouter();
   const {id} = useParams();
@@ -30,7 +30,7 @@ export default function Page(){
       const {post}:{post:Post} = await res.json();
       setTitle(post.title)
       setContent(post.content)
-      setThumbnailUrl(post.thumbnailUrl)
+      setThumbnailImageKey(post.thumbnailImageKey)
       setCategories(post.postCategories.map((pc) => pc.category))
     }
     fetcher();
@@ -66,7 +66,7 @@ export default function Page(){
       return;
     };
 
-    const body:UpdatePostRequestBody = {title,content,thumbnailUrl,categories}
+    const body:UpdatePostRequestBody = {title,content,thumbnailImageKey,categories}
     const res = await fetch(`/api/admin/posts/${id}`,{
       'method':'PUT',
       headers:{
@@ -92,8 +92,8 @@ export default function Page(){
       setContent={setContent}
       categories={categories}
       setCategories={setCategories}
-      thumbnailUrl={thumbnailUrl}
-      setThumbnailUrl={setThumbnailUrl}
+      thumbnailImageKey={thumbnailImageKey}
+      setThumbnailImageKey={setThumbnailImageKey}
       onDelete={handleDelete}
       onSubmit={handleSubmit}
       mode='edit'
