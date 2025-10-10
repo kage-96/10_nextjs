@@ -1,5 +1,5 @@
 'use client'
-import { fetcher } from '@/lib/fetcher';
+import { useFetcher } from '@/app/_hooks/useFetcher';
 import { Post } from '@/types/Post';
 import { supabase } from '@/utils/supabase';
 import Image from 'next/image';
@@ -11,10 +11,7 @@ import useSWR from 'swr';
 export default function Page(){
   const {id} = useParams();
   const [thumbnailImageUrl,setThumbnailImageUrl] = useState<string | null>(null)
-  const { data, error, isLoading} = useSWR<{post:Post}>(
-    `/api/posts/${id}`,
-    fetcher
-  )
+  const { data, error, isLoading} = useFetcher<{post:Post}>(`/api/posts/${id}`)
 
   useEffect(() => {
     if(!data?.post?.thumbnailImageKey) return;

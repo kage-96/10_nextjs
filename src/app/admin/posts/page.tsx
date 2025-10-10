@@ -1,6 +1,6 @@
 'use client'
+import { useFetcher } from "@/app/_hooks/useFetcher";
 import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
-import { adminFetcher } from "@/lib/fetcher";
 import { Post } from "@/types/Post";
 import Link from "next/link";
 import useSWR from "swr";
@@ -9,9 +9,9 @@ import useSWR from "swr";
 export default function Page(){
   const {token} = useSupabaseSession();
 
-  const { data, error, isLoading } = useSWR<{posts:Post[]}>(
+  const { data, error, isLoading } = useFetcher<{posts:Post[]}>(
     token ? '/api/admin/posts' : null,
-    adminFetcher(token)
+    token
   )
 
   if (isLoading) return <p>読み込み中...</p>

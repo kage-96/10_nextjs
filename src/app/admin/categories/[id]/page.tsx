@@ -4,9 +4,9 @@ import { CategoryForm } from "../_components/CategoryForm";
 import { UpdateCategoryRequestBody } from "@/app/api/admin/categories/[id]/route";
 import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
 import useSWR from "swr";
-import { adminFetcher } from "@/lib/fetcher";
 import { Category } from "@/types/Category";
 import { useEffect, useState } from "react";
+import { useFetcher } from "@/app/_hooks/useFetcher";
 
 export default function Page(){
   const [name, setName] = useState<string>("")
@@ -55,9 +55,9 @@ export default function Page(){
     }
   }
 
-  const {data, error ,isLoading } = useSWR<{category:Category}>(
+  const {data, error ,isLoading } = useFetcher<{category:Category}>(
     token ? `/api/admin/categories/${id}` : null ,
-    adminFetcher(token)
+    token
   )
 
   useEffect(() => {

@@ -2,14 +2,12 @@
 import { Category } from "@/types/Category";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-
-
 import { Post } from "@/types/Post";
 import { PostForm } from "../_components/PostForm";
 import { UpdatePostRequestBody } from "@/app/api/admin/posts/[id]/route";
 import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
 import useSWR from "swr";
-import { adminFetcher } from "@/lib/fetcher";
+import { useFetcher } from "@/app/_hooks/useFetcher";
 
 export default function Page(){
   const [title,setTitle] = useState<string>("")
@@ -20,9 +18,9 @@ export default function Page(){
   const {id} = useParams();
   const {token} = useSupabaseSession()
 
-  const {data, error, isLoading} = useSWR<{post:Post}>(
+  const {data, error, isLoading} = useFetcher<{post:Post}>(
     token ? `/api/admin/posts/${id}` : null,
-    adminFetcher(token)
+    token
   )
 
   useEffect(() => {

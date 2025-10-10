@@ -1,6 +1,6 @@
 'use client'
+import { useFetcher } from "@/app/_hooks/useFetcher";
 import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
-import { adminFetcher } from "@/lib/fetcher";
 import { Category } from "@/types/Category";
 import Link from "next/link";
 import useSWR from "swr";
@@ -8,11 +8,11 @@ import useSWR from "swr";
 export default function Page(){
   const {token} = useSupabaseSession()
 
-  const {data, error ,isLoading } = useSWR<{categories:Category[]}>(
+  const {data, error ,isLoading } = useFetcher<{categories:Category[]}>(
     token ? '/api/admin/categories' : null,
-    adminFetcher(token)
+    token
   )
-  
+
   if (isLoading) return <p>読み込み中...</p>
   if (error) return <p>エラーが発生しました</p>
   if (!data?.categories) return <p>カテゴリーがありません</p>
