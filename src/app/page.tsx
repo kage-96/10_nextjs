@@ -1,27 +1,22 @@
 'use client'
 import { Post } from "@/types/Post"
 import Link from "next/link"
-import { useEffect, useState } from "react"
 import classes from './styles/post.module.css'
+import useSWR from "swr"
+
+const fetcher = (url:string) => fetch(url).then(res => res.json())
 
 export default function Home(){
-  const [posts,setPosts] = useState<Post[]>([])
+  const {data, error, isLoading} = useSWR<{posts:Post[]}>('/api/posts',fetcher)
 
-  useEffect(() => {
-    const fetcher = async () => {
-      const res = await fetch('/api/posts',{
-        method:"GET"
-      })
-      const {posts}:{posts:Post[]} = await res.json();
-      setPosts(posts)
-    }
-    fetcher()
-  },[])
+  if(isLoading) return <p>読み込み中...</p>
+  if(error) return <p>エラーが発生しました。</p>
+  if(!data?.posts) return <p>記事がありません。</p>
 
   return(
     <div className="mx-auto mt-8 max-w-[800px] p-2">
       <ul>
-        {posts.map((post) => {
+        {data.posts.map((post) => {
           const date = new Date(post.createdAt)
           return(
             <li key={post.id} className="mb-4">

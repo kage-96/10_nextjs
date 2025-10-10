@@ -1,12 +1,15 @@
 'use client'
 import { useParams, useRouter } from "next/navigation"
-import { useEffect, useState } from "react";
 import { CategoryForm } from "../_components/CategoryForm";
 import { UpdateCategoryRequestBody } from "@/app/api/admin/categories/[id]/route";
 import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
+import useSWR from "swr";
+import { adminFetcher } from "@/lib/fetcher";
+import { Category } from "@/types/Category";
+import { useEffect, useState } from "react";
 
 export default function Page(){
-  const [name,setName] = useState<string>("")
+  const [name, setName] = useState<string>("")
   const {id} = useParams();
   const router = useRouter();
   const {token} = useSupabaseSession()
@@ -14,10 +17,6 @@ export default function Page(){
   const handleSubmit = async (e:React.FormEvent) => {
     e.preventDefault();
     if(!token) return
-
-    if(name.trim() === ""){
-      return;
-    };
 
     const body:UpdateCategoryRequestBody = {name}
     const res = await fetch(`/api/admin/categories/${id}`,{
@@ -56,19 +55,20 @@ export default function Page(){
     }
   }
 
+  const {data, error ,isLoading } = useSWR<{category:Category}>(
+    token ? `/api/admin/categories/${id}` : null ,
+    adminFetcher(token)
+  )
+
   useEffect(() => {
-    if(!token) return
-    const fetcher = async () => {
-      const res = await fetch(`/api/admin/categories/${id}`,{
-        headers:{
-          Authorization: token,
-        }
-      });
-      const {category} = await res.json();
-      setName(category.name);
+    if(data?.category?.name){
+      setName(data.category.name)
     }
-    fetcher();
-  },[id,token])
+  },[data])
+
+  if (isLoading) return <p>読み込み中...</p>
+  if (error) return <p>エラーが発生しました</p>
+  if (!data?.category) return <p>カテゴリーがありません</p>
 
   return(
     <CategoryForm

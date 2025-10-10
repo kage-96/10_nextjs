@@ -7,7 +7,6 @@ import { supabase } from '@/utils/supabase'
 export const Header:FC = () => {
 
   const { isLoading,session } = useSupabaseSession()
-  console.log(session)
 
   const handleLogout = async () => {
     await supabase.auth.signOut()

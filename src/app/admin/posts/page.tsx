@@ -1,26 +1,22 @@
 'use client'
 import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
+import { adminFetcher } from "@/lib/fetcher";
 import { Post } from "@/types/Post";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import useSWR from "swr";
+
 
 export default function Page(){
-  const [posts, setPosts] = useState<Post[]>([])
   const {token} = useSupabaseSession();
-  
-  useEffect(() => {
-    if(!token) return;
-    const fetcher = async () => {
-      const res = await fetch('/api/admin/posts',{
-        headers:{
-          Authorization: token,
-        }
-      });
-      const {posts} = await res.json()
-      setPosts([...posts])
-    }
-    fetcher();
-  },[token])
+
+  const { data, error, isLoading } = useSWR<{posts:Post[]}>(
+    token ? '/api/admin/posts' : null,
+    adminFetcher(token)
+  )
+
+  if (isLoading) return <p>読み込み中...</p>
+  if (error) return <p>エラーが発生しました</p>
+  if (!data?.posts) return <p>記事がありません</p>
   
   return(
     <>
@@ -29,7 +25,7 @@ export default function Page(){
         <Link href="/admin/posts/new" className="bg-blue-500 text-white rounded font-bold py-2 px-4 hover:bg-blue-700">新規作成</Link>
       </div>
       <ul>
-        {posts.map((post) => {
+        {data.posts.map((post) => {
           return(
           <li key={post.id}>
             <Link href={`/admin/posts/${post.id}`}>

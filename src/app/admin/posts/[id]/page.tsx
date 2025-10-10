@@ -8,6 +8,8 @@ import { Post } from "@/types/Post";
 import { PostForm } from "../_components/PostForm";
 import { UpdatePostRequestBody } from "@/app/api/admin/posts/[id]/route";
 import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
+import useSWR from "swr";
+import { adminFetcher } from "@/lib/fetcher";
 
 export default function Page(){
   const [title,setTitle] = useState<string>("")
@@ -18,24 +20,24 @@ export default function Page(){
   const {id} = useParams();
   const {token} = useSupabaseSession()
 
+  const {data, error, isLoading} = useSWR<{post:Post}>(
+    token ? `/api/admin/posts/${id}` : null,
+    adminFetcher(token)
+  )
 
   useEffect(() => {
-    if(!token) return;
-    const fetcher = async () => {
-      const res = await fetch(`/api/admin/posts/${id}`,{
-        headers:{
-          Authorization: token,
-        }
-      })
-      const {post}:{post:Post} = await res.json();
-      setTitle(post.title)
-      setContent(post.content)
-      setThumbnailImageKey(post.thumbnailImageKey)
-      setCategories(post.postCategories.map((pc) => pc.category))
+    if (data?.post) {
+      setTitle(data.post.title)
+      setContent(data.post.content)
+      setThumbnailImageKey(data.post.thumbnailImageKey)
+      setCategories(data.post.postCategories.map((pc) => pc.category))
     }
-    fetcher();
-  },[id,token])
+  }, [data])
 
+    // 読み込み中やエラー処理
+  if (isLoading) return <p>読み込み中...</p>
+  if (error) return <p>エラーが発生しました</p>
+  if (!data?.post) return <p>記事が見つかりません</p>
 
 
   const handleDelete = async () => {

@@ -1,22 +1,27 @@
 'use client';
-import React, { useState } from 'react'
+import React from 'react'
 import { Label } from '../_components/Label';
 import { Input } from '../_components/Input';
 import { Button } from '../_components/Button';
 import { supabase } from '@/utils/supabase';
 import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+
+interface FormValues {
+  email:string
+  password:string
+}
 
 export default function Login(){
-  const [email, setEmail] = useState<string>("")
-  const [password, setPassword] = useState<string>("")
+
+  const {register, handleSubmit, formState:{errors}} = useForm<FormValues>()
   const router = useRouter();
 
-  const handleSubmit = async (e:React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const onSubmit = async (data:FormValues) => {
 
     const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+      email:data.email,
+      password:data.password,
     })
     if(error){
       alert('ログインに失敗しました。')
@@ -28,25 +33,23 @@ export default function Login(){
 
   return (
     <div className='flex justify-center pt-[240px]'>
-      <form className='space-y-4 w-full max-w-[400px]' onSubmit={handleSubmit}>
+      <form className='space-y-4 w-full max-w-[400px]' onSubmit={handleSubmit(onSubmit)}>
         <div>
           <Label htmlFor="email">メールアドレス</Label>
           <Input
+          {...register('email',{required:"必須項目です。"})}
             type="email"
             id="email"
-            value={email}
             placeholder='name@company.com'
-            onChange={(e) => {setEmail(e.target.value)}}
           />
         </div>
         <div>
           <Label htmlFor="password">パスワード</Label>
           <Input
+          {...register('password',{required:"必須項目です。"})}
             type="password"
             id="password"
-            value={password}
             placeholder='⚫︎⚫︎⚫︎⚫︎⚫︎⚫︎⚫︎'
-            onChange={(e) => {setPassword(e.target.value)}}
           />
         </div>
         <div>

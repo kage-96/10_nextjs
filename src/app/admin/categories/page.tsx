@@ -1,27 +1,22 @@
 'use client'
 import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
+import { adminFetcher } from "@/lib/fetcher";
 import { Category } from "@/types/Category";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import useSWR from "swr";
 
 export default function Page(){
-  const [categories, setCategories] = useState<Category[]>([])
   const {token} = useSupabaseSession()
 
-  useEffect(() => {
-    if(!token) return
-    const fetcher = async () => {
-      const res = await fetch('/api/admin/categories',{
-        headers:{
-          Authorization: token,
-        }
-      });
-      const {categories} = await res.json()
-      setCategories(categories)
-    }
-    fetcher();
-  },[token])
+  const {data, error ,isLoading } = useSWR<{categories:Category[]}>(
+    token ? '/api/admin/categories' : null,
+    adminFetcher(token)
+  )
   
+  if (isLoading) return <p>読み込み中...</p>
+  if (error) return <p>エラーが発生しました</p>
+  if (!data?.categories) return <p>カテゴリーがありません</p>
+
   return(
     <>
       <div className="flex justify-between items-center mb-8">
@@ -29,7 +24,7 @@ export default function Page(){
         <Link href="/admin/categories/new" className="bg-blue-500 text-white rounded font-bold py-2 px-4 hover:bg-blue-700">新規作成</Link>
       </div>
       <ul>
-        {categories.map((category) => {
+        {data.categories.map((category) => {
           const date = new Date(category.createdAt);
           return(
           <li key={category.id}>

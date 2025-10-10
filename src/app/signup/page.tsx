@@ -4,18 +4,20 @@ import { useState } from "react"
 import { Label } from "../_components/Label";
 import { Input } from "../_components/Input";
 import { Button } from "../_components/Button";
+import { useForm } from "react-hook-form";
+
+interface FormValues {
+  email:string
+  password:string
+}
 
 export default function Page(){
-  const [email,setEmail] = useState('')
-  const [password,setPassword] = useState('')
+  const {register, handleSubmit, reset, formState:{errors}} = useForm<FormValues>()
 
-
-  const handleSubmit = async (e:React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
+  const onSubmit = async (data:FormValues) => {
     const { error } = await supabase.auth.signUp({
-      email,
-      password,
+      email: data.email,
+      password: data.password,
       options:{
         emailRedirectTo:`http:localhost:3001/login`,
       },
@@ -24,31 +26,30 @@ export default function Page(){
     if(error){
       alert('サインアップに失敗しました。')
     }else{
-      setEmail('')
-      setPassword('')
+      reset()
       alert('サインアップに成功しました。')
     }
+
   }
+
   return(
     <div className="pt-[240px] flex justify-center">
-      <form onSubmit={handleSubmit} className="space-y-4 w-full max-w-[400px]">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 w-full max-w-[400px]">
         <div>
           <Label htmlFor="email">メールアドレス</Label>
           <Input
+          {...register("email",{required:"必須項目です。"})}
             type="email"
             id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
             placeholder="name@company.com"
             />
         </div>
         <div>
           <Label htmlFor="password">パスワード</Label>
           <Input
+          {...register('password',{required:'必須項目です。'})}
             type="password"
             id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
             placeholder="⚫︎⚫︎⚫︎⚫︎⚫︎⚫︎⚫︎"
             />
         </div>
