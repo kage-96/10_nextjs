@@ -1,8 +1,11 @@
 'use client'
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useRouteGuard } from "../_hooks/useRouteGuard";
 
 export default function AdminLayout({children}:{children:React.ReactNode}){
+  useRouteGuard();
+  
   const pathname = usePathname();
 
   return(

@@ -1,26 +1,29 @@
 'use client'
 import { useParams, useRouter } from "next/navigation"
-import { useEffect, useState } from "react";
 import { CategoryForm } from "../_components/CategoryForm";
 import { UpdateCategoryRequestBody } from "@/app/api/admin/categories/[id]/route";
+import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession";
+import useSWR from "swr";
+import { Category } from "@/types/Category";
+import { useEffect, useState } from "react";
+import { useFetcher } from "@/app/_hooks/useFetcher";
 
 export default function Page(){
-  const [name,setName] = useState<string>("")
+  const [name, setName] = useState<string>("")
   const {id} = useParams();
   const router = useRouter();
+  const {token} = useSupabaseSession()
 
   const handleSubmit = async (e:React.FormEvent) => {
     e.preventDefault();
-
-    if(name.trim() === ""){
-      return;
-    };
+    if(!token) return
 
     const body:UpdateCategoryRequestBody = {name}
     const res = await fetch(`/api/admin/categories/${id}`,{
       method:'PUT',
       headers:{
         'Content-Type': 'application/json',
+        Authorization: token,
       },
       body:JSON.stringify(body),
     })
@@ -36,9 +39,13 @@ export default function Page(){
 
   const handleDelete = async () => {
     if(!confirm("本当に削除しますか？")) return;
+    if(!token)return
 
     const res = await fetch(`/api/admin/categories/${id}`,{
-      method:"DELETE"
+      method:"DELETE",
+      headers:{
+        Authorization: token,
+      }
     })
     if(res.status === 200){
       alert('カテゴリーを削除しました。')
@@ -48,14 +55,20 @@ export default function Page(){
     }
   }
 
+  const {data, error ,isLoading } = useFetcher<{category:Category}>(
+    token ? `/api/admin/categories/${id}` : null ,
+    token
+  )
+
   useEffect(() => {
-    const fetcher = async () => {
-      const res = await fetch(`/api/admin/categories/${id}`);
-      const {category} = await res.json();
-      setName(category.name);
+    if(data?.category?.name){
+      setName(data.category.name)
     }
-    fetcher();
-  },[id])
+  },[data])
+
+  if (isLoading) return <p>読み込み中...</p>
+  if (error) return <p>エラーが発生しました</p>
+  if (!data?.category) return <p>カテゴリーがありません</p>
 
   return(
     <CategoryForm

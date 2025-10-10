@@ -1,3 +1,4 @@
+import { supabase } from "@/utils/supabase";
 import { PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -7,13 +8,20 @@ export interface UpdatePostRequestBody {
   title:string
   content:string
   categories:{id:number}[]
-  thumbnailUrl:string
+  thumbnailImageKey:string
 }
 
 export const PUT = async(request:NextRequest,{params}:{params:{id:string}}) => {
+  const token = request.headers.get('Authorization') ?? ''
+
+  const {error} = await supabase.auth.getUser(token)
+
+  if(error){
+    return NextResponse.json({status:error.message},{status:400})
+  }
   const {id} = params;
 
-  const {title,content,categories,thumbnailUrl}:UpdatePostRequestBody = await request.json();
+  const {title,content,categories,thumbnailImageKey}:UpdatePostRequestBody = await request.json();
 
   try{
     const post = await prisma.post.update({
@@ -23,7 +31,7 @@ export const PUT = async(request:NextRequest,{params}:{params:{id:string}}) => {
       data:{
         title,
         content,
-        thumbnailUrl
+        thumbnailImageKey
       },
     })
     await prisma.postCategory.deleteMany({
@@ -57,6 +65,13 @@ export const PUT = async(request:NextRequest,{params}:{params:{id:string}}) => {
 }
 
 export const GET = async (request:NextRequest,{params}:{params:{id:string}}) => {
+  const token = request.headers.get('Authorization') ?? ''
+
+  const {error} = await supabase.auth.getUser(token)
+
+  if(error){
+    return NextResponse.json({status:error.message},{status:400})
+  }
   const {id} = params;
 
   try{
@@ -98,6 +113,13 @@ export const GET = async (request:NextRequest,{params}:{params:{id:string}}) => 
 
 export const DELETE = async (request:NextRequest,{params}:{params:{id:string}}) => {
   const {id} = params;
+  const token = request.headers.get('Authorization') ?? ''
+
+  const {error} = await supabase.auth.getUser(token)
+
+  if(error){
+    return NextResponse.json({status:error.message},{status:400})
+  }
 
   try{
     await prisma.post.delete({

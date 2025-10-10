@@ -1,18 +1,18 @@
-import { ChangeEvent, FC } from "react"
+import { forwardRef } from "react"
 
 
-interface Props extends React.ComponentProps<'input'> {
-  onChange:(e:ChangeEvent<HTMLInputElement>) => void;
-}
+interface Props extends React.ComponentProps<'input'> {}
 
-export const Input:FC<Props> = ({onChange,...props}) => {
+export const Input = forwardRef<HTMLInputElement,Props>(({...props},ref) => {
   return(
     <div>
       <input
+      ref={ref}
         {...props}
-        onChange={onChange}
-        className="block border w-full p-3 rounded-md mt-1 border-gray-200"
+        className="block border w-full p-3 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 text-gray-900 rounded-md mt-1 border-gray-200"
         />
       </div>
-  )
-}
+    )
+  }
+)
+Input.displayName = "Input"

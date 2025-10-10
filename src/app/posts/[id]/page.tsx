@@ -1,33 +1,45 @@
 'use client'
+import { useFetcher } from '@/app/_hooks/useFetcher';
 import { Post } from '@/types/Post';
+import { supabase } from '@/utils/supabase';
 import Image from 'next/image';
 import { useParams } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
+import useSWR from 'swr';
+
 
 export default function Page(){
-  const [post,setPost] = useState<Post | null>(null)
   const {id} = useParams();
+  const [thumbnailImageUrl,setThumbnailImageUrl] = useState<string | null>(null)
+  const { data, error, isLoading} = useFetcher<{post:Post}>(`/api/posts/${id}`)
 
   useEffect(() => {
-    const fetcher = async () => {
-      const res = await fetch(`/api/posts/${id}`)
-      const {post} = await res.json();
-      setPost(post);
-    }
-    fetcher()
-  },[id])
+    if(!data?.post?.thumbnailImageKey) return;
 
-  if(!post)return <p>記事が見つかりません。</p>
+      const {data:{publicUrl}} = supabase.storage
+      .from('post_thumbnail')
+      .getPublicUrl(data.post.thumbnailImageKey)
+
+      setThumbnailImageUrl(publicUrl)
+
+  },[data?.post?.thumbnailImageKey])
+
+  if(isLoading)return <p>Loading...</p>
+  if(error) return <p>エラーが発生しました。</p>
+  if(!data?.post)return <p>記事が見つかりません。</p>
 
   return (
     <div className='max-w-[800px] mx-auto m-8 p-2'>
-      <Image src={post.thumbnailUrl} alt='' height={1000} width={1000} />
+      {thumbnailImageUrl && (
+        <Image src={thumbnailImageUrl} alt='' height={400} width={400} />
+      )}
       <div className="flex justify-between items-center text-sm my-4">
         <p className="text-gray-500">
-          {new Date(post.createdAt).toLocaleDateString()}
+          {new Date(data.post.createdAt).toLocaleDateString()}
         </p>
         <ul className="flex font-bold">
-          {post.postCategories.map((category) => {
+          {data.post.postCategories.map((category) => {
+            console.log(category)
             return(
               <li
                 key={category.category.id}
@@ -40,8 +52,8 @@ export default function Page(){
         </ul>
       </div>
       <div className="p-2">
-        <p className="mb-4 text-xl font-bold">{post.title}</p>
-        <p className=''>{post.content}</p>
+        <p className="mb-4 text-xl font-bold">{data.post.title}</p>
+        <p className=''>{data.post.content}</p>
       </div>
     </div>
   )
