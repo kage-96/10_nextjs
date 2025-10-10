@@ -2,12 +2,10 @@
 import { Post } from "@/types/Post"
 import Link from "next/link"
 import classes from './styles/post.module.css'
-import useSWR from "swr"
-
-const fetcher = (url:string) => fetch(url).then(res => res.json())
+import { useFetcher } from "./_hooks/useFetcher"
 
 export default function Home(){
-  const {data, error, isLoading} = useSWR<{posts:Post[]}>('/api/posts',fetcher)
+  const {data, error, isLoading} = useFetcher<{posts:Post[]}>('/api/posts')
 
   if(isLoading) return <p>読み込み中...</p>
   if(error) return <p>エラーが発生しました。</p>
